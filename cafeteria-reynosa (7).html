@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cafetería Reynosa | Menú</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  :root {
+    --bg-base: #d9c7a8; --beige: rgba(242,232,214,0.96); --gold-dark: #8a6a12; --sidebar: rgba(84, 60, 44, 0.95); --glass: rgba(255, 255, 255, 0.85);
+    --text: #2d1e16; --text-light: #6d5a50; --accent: #c49a6c; --gold: #d4af37;
+    --success: #2e7d32; --danger: #c62828; --info: #1565c0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+  body { display: flex; height: 100vh; overflow: hidden; background-color: var(--bg-base); color: var(--text); }
+
+  .sidebar { width: 270px; background: var(--beige); backdrop-filter: blur(15px); color: #4a3426; padding: 30px 25px; display: flex; flex-direction: column; gap: 10px; z-index: 10; border-right: 1px solid rgba(74,52,38,0.12); box-shadow: 5px 0 30px rgba(74,52,38,0.25); overflow-y: auto; }
+  .sidebar h1 { font-family: 'Playfair Display', serif; font-size: 24px; text-align: center; color: var(--gold-dark); margin-bottom: 20px; line-height: 1.2; }
+  .sidebar h1 span { display: block; font-size: 11px; color: #8d6e63; letter-spacing: 3px; text-transform: uppercase; }
+  .nav-btn { background: transparent; color: #7a6552; border: none; padding: 14px 18px; text-align: left; font-size: 14px; border-radius: 12px; cursor: pointer; transition: all 0.4s ease; display: flex; align-items: center; gap: 10px; border: 1px solid transparent; }
+  .nav-btn:hover, .nav-btn.active { background: rgba(196, 154, 108, 0.15); color: var(--gold-dark); border: 1px solid rgba(196, 154, 108, 0.3); transform: translateX(8px); }
+
+  /* SELLO DE LA APP */
+  .sello-app { margin: 20px auto 0; width: 120px; height: 120px; border-radius: 50%; border: 3px double var(--gold); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: var(--gold-dark); background: radial-gradient(circle, rgba(212,175,55,0.12), rgba(212,175,55,0.02)); box-shadow: 0 0 20px rgba(212,175,55,0.2), inset 0 0 12px rgba(212,175,55,0.15); transform: rotate(-8deg); }
+  .sello-app .s-icon { font-size: 28px; line-height: 1; }
+  .sello-app .s-nombre { font-family: 'Playfair Display', serif; font-size: 11px; font-weight: 600; margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+  .sello-app .s-linea { font-size: 8px; letter-spacing: 2px; text-transform: uppercase; color: #6d5a50; margin-top: 3px; }
+  .sello-app .s-check { font-size: 9px; margin-top: 3px; color: #2e7d32; }
+
+  .social-links { margin-top: auto; display: flex; justify-content: center; gap: 15px; padding-top: 20px; border-top: 1px solid rgba(74,52,38,0.15); }
+  .social-links a { display: flex; justify-content: center; align-items: center; width: 45px; height: 45px; border-radius: 50%; background: rgba(74,52,38,0.12); color: #4a3426; text-decoration: none; transition: 0.3s; font-size: 22px; }
+  .social-links a:hover { transform: translateY(-5px); background: white; }
+  .social-links a:hover .fa-whatsapp { color: #25D366; }
+  .social-links a:hover .fa-facebook-f { color: #1877F2; }
+
+  .btn-logout { background: transparent; color: #e53935; border: 1px solid #e53935; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 15px; transition: 0.3s; text-align: center; text-decoration: none; font-size: 14px;}
+  .btn-logout:hover { background: #e53935; color: white; }
+
+  .main { flex: 1; overflow-y: auto; position: relative; background-size: cover; background-position: center; background-attachment: fixed; transition: background-image 0.8s; display: flex; flex-direction: column; }
+  .main::before { content: ""; position: fixed; top: 0; left: 270px; right: 0; bottom: 0; background: linear-gradient(135deg, rgba(236,222,196,0.72), rgba(236,222,196,0.45)); z-index: 0; pointer-events: none; }
+  .content-wrapper { position: relative; z-index: 1; padding: 40px; flex: 1; }
+  .section { display: none; animation: slideUp 0.5s; } .section.active { display: block; }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+  .page-title { font-family: 'Playfair Display', serif; font-size: 36px; color: #4a3426; margin-bottom: 30px; text-shadow: 1px 1px 3px rgba(255,255,255,0.6); display: flex; justify-content: space-between; align-items: center;}
+
+  .glass-card { background: var(--glass); backdrop-filter: blur(20px); padding: 25px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.5); }
+
+  .btn-main { background: var(--sidebar); color: var(--gold); border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; transition: 0.3s; }
+  .btn-main:hover { background: var(--gold); color: var(--sidebar); }
+
+  .modal-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 100; justify-content: center; align-items: center; }
+  .modal-box { background: #fffaf5; padding: 30px; border-radius: 16px; width: 550px; max-width: 95vw; box-shadow: 0 20px 50px rgba(0,0,0,0.3); border-top: 5px solid var(--accent); max-height: 90vh; overflow-y: auto;}
+  .modal-box h3 { margin-bottom: 20px; font-family: 'Playfair Display', serif; font-size: 24px; color: var(--sidebar); }
+  .input-group { margin-bottom: 15px; }
+  .input-group label { display: block; font-size: 12px; margin-bottom: 5px; color: var(--text-light); font-weight: 600; text-transform: uppercase; }
+  .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: 'Poppins'; font-size: 14px; }
+
+  .help-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; border-radius: 50%; background: var(--gold); color: var(--sidebar); font-size: 30px; border: none; cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.3); z-index: 50; display: flex; justify-content: center; align-items: center; transition: 0.3s; }
+  .help-btn:hover { transform: scale(1.1); }
+
+  .help-tabs { display: flex; gap: 5px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; flex-wrap: wrap; }
+  .help-tab { background: transparent; border: none; padding: 8px 12px; font-weight: 600; color: var(--text-light); cursor: pointer; border-radius: 8px; transition: 0.3s; }
+  .help-tab.active { background: var(--accent); color: white; }
+  .help-content { display: none; font-size: 14px; color: var(--text-light); line-height: 1.6; }
+  .help-content.active { display: block; }
+  .help-content h4 { color: var(--accent); margin-bottom: 8px; margin-top: 15px; }
+  .help-content p { margin-bottom: 10px; }
+  .help-content ul { padding-left: 20px; margin-bottom: 10px; }
+
+  .menu-layout { display: grid; grid-template-columns: 1fr 360px; gap: 25px; }
+  .cat-tabs { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
+  .cat-tab { background: var(--glass); border: 1px solid var(--accent); color: var(--sidebar); padding: 10px 20px; border-radius: 30px; cursor: pointer; font-size: 14px; font-weight: 600; transition: 0.3s; white-space: nowrap; }
+  .cat-tab.active { background: var(--accent); color: white; box-shadow: 0 5px 15px rgba(196,154,108,0.4); }
+
+  .grid-prod { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
+  .prod-card { background: var(--glass); border-radius: 16px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.1); padding-bottom: 15px; text-align: center; transition: 0.3s; border: 1px solid rgba(255,255,255,0.5); display: flex; flex-direction: column; }
+  .prod-card:hover { transform: translateY(-5px); box-shadow: 0 15px 25px rgba(0,0,0,0.15); }
+  .prod-card img { width: 100%; height: 120px; object-fit: cover; }
+  .prod-card h4 { font-family: 'Playfair Display', serif; font-size: 15px; margin: 10px 0 4px; color: var(--sidebar); flex: 1; padding: 0 8px;}
+  .prod-card p { font-size: 14px; font-weight: bold; color: var(--accent); margin-bottom: 10px; }
+  .btn-add { width: 85%; background: var(--sidebar); color: var(--gold); border: none; padding: 8px; border-radius: 8px; cursor: pointer; font-weight: 600; margin: 0 auto; }
+  .btn-add:hover { background: var(--gold); color: var(--sidebar); }
+
+  .carrito-panel { background: var(--glass); padding: 25px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); height: fit-content; border: 1px solid rgba(255,255,255,0.5); }
+  .cart-item { display: flex; justify-content: space-between; align-items: center; font-size: 14px; padding: 10px 0; border-bottom: 1px dashed rgba(0,0,0,0.1); gap: 8px; }
+  .cart-item .qty button { border: none; background: #eee; width: 22px; height: 22px; border-radius: 50%; cursor: pointer; font-weight: bold; }
+  .cart-line { display: flex; justify-content: space-between; font-size: 14px; margin-top: 8px; color: var(--text-light); }
+  .cart-total { display: flex; justify-content: space-between; font-size: 22px; font-family: 'Playfair Display', serif; font-weight: bold; margin: 15px 0 20px; color: var(--sidebar); }
+  .btn-cobrar { width: 100%; background: var(--success); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; }
+  .btn-cobrar:hover { background: #1b5e20; }
+  .metodo-pago { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ccc; font-family: 'Poppins'; font-size: 14px; }
+  .lbl { font-size: 12px; font-weight: 600; color: var(--text-light); text-transform: uppercase; display: block; margin: 12px 0 5px; }
+  .eta-box { background: #e3f2fd; color: var(--info); border-radius: 10px; padding: 12px; font-size: 13px; margin-bottom: 10px; line-height: 1.5; }
+  .free-box { background: #e8f5e9; color: var(--success); border-radius: 10px; padding: 8px 12px; font-size: 12px; margin-bottom: 10px; }
+
+  /* SEGUIMIENTO */
+  .pedido-card { background: var(--glass); border-radius: 16px; padding: 22px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.5); box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
+  .pedido-head { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .pedido-head strong { font-family: 'Playfair Display', serif; font-size: 18px; }
+  .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; background: #fff3e0; color: #e65100; }
+  .badge.ok { background: #e8f5e9; color: var(--success); }
+  .pasos { display: flex; justify-content: space-between; margin: 18px 0 10px; position: relative; }
+  .pasos::before { content: ""; position: absolute; top: 14px; left: 8%; right: 8%; height: 3px; background: #ddd; z-index: 0; }
+  .paso { flex: 1; text-align: center; font-size: 11px; color: #999; position: relative; z-index: 1; }
+  .paso .dot { width: 30px; height: 30px; border-radius: 50%; background: #ddd; color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; font-size: 13px; }
+  .paso.hecho { color: var(--success); font-weight: 600; }
+  .paso.hecho .dot { background: var(--success); }
+  .paso.actual .dot { background: var(--gold); box-shadow: 0 0 0 5px rgba(212,175,55,0.3); }
+  .paso.actual { color: var(--text); font-weight: 600; }
+
+  /* FAQ */
+  .faq-item { background: var(--glass); border-radius: 12px; margin-bottom: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.5); }
+  .faq-q { width: 100%; text-align: left; background: transparent; border: none; padding: 18px 22px; font-size: 15px; font-weight: 600; color: var(--sidebar); cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .faq-q i { transition: 0.3s; color: var(--accent); }
+  .faq-item.open .faq-q i { transform: rotate(180deg); }
+  .faq-a { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; padding: 0 22px; font-size: 14px; color: var(--text-light); line-height: 1.6; }
+  .faq-item.open .faq-a { max-height: 300px; padding-bottom: 18px; }
+
+  /* RESEÑAS */
+  .resenas-layout { display: grid; grid-template-columns: 1fr 360px; gap: 25px; }
+  .resumen-estrellas { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+  .resumen-estrellas .num { font-family: 'Playfair Display', serif; font-size: 48px; color: var(--sidebar); line-height: 1; }
+  .estrellas { color: #b8860b; letter-spacing: 2px; }
+  .resena { background: var(--glass); border-radius: 14px; padding: 18px 20px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.5); }
+  .resena-head { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+  .resena p { font-size: 14px; color: var(--text-light); line-height: 1.5; }
+  .resena small { color: #999; font-size: 11px; }
+  .star-input { display: flex; gap: 5px; font-size: 30px; cursor: pointer; margin-bottom: 15px; }
+  .star-input span { color: #ccc; transition: 0.2s; }
+  .star-input span.on { color: var(--gold); }
+
+  .footer-sello {
+    position: relative; z-index: 1; text-align: center; padding: 15px;
+    background: rgba(104, 76, 56, 0.85); color: #a89f91; font-size: 12px;
+    border-top: 1px solid rgba(212, 175, 55, 0.2);
+    display: flex; justify-content: center; align-items: center; gap: 15px; flex-wrap: wrap;
+  }
+  .footer-pro { position: relative; z-index: 1; background: var(--beige); color: #5a4130; padding: 40px 40px 15px; border-top: 1px solid rgba(160,120,30,0.35); font-size: 13px; line-height: 1.6; }
+  .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 30px; margin-bottom: 25px; }
+  .f-marca { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--gold-dark); margin-bottom: 8px; }
+  .f-titulo { font-weight: 600; color: var(--gold-dark); margin-bottom: 10px; font-size: 15px; }
+  .f-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .f-redes { display: flex; gap: 12px; }
+  .f-redes a { width: 40px; height: 40px; border-radius: 50%; background: rgba(74,52,38,0.12); color: #4a3426; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 18px; transition: 0.3s; }
+  .f-redes a:hover { background: #4a3426; transform: translateY(-4px); color: #f5ecdc; }
+  .f-link { display: block; color: #5a4130; text-decoration: none; margin-bottom: 6px; transition: 0.2s; }
+  .f-link:hover { color: var(--gold-dark); padding-left: 5px; }
+  .f-copy { text-align: center; padding-top: 15px; border-top: 1px solid rgba(74,52,38,0.15); font-size: 12px; color: #7a6552; }
+  .mini-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-top: 30px; }
+  .mini-grid .glass-card { background: linear-gradient(145deg, rgba(250,243,230,0.94), rgba(238,226,206,0.94)); border: 1px solid rgba(160,120,30,0.4); padding: 32px 30px; box-shadow: 0 20px 45px rgba(74,52,38,0.3); color: #4a3426; }
+  .mini-titulo { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 600; color: var(--gold-dark); letter-spacing: 1px; margin-bottom: 22px; padding-bottom: 14px; text-align: center; position: relative; }
+  .mini-titulo::after { content: "✦"; position: absolute; left: 50%; bottom: -9px; transform: translateX(-50%); background: #f4ead8; padding: 0 10px; font-size: 12px; color: var(--gold-dark); }
+  .mini-titulo::before { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(212,175,55,0.6), transparent); }
+
+  .mini-grid .faq-item { background: transparent; border: none; border-bottom: 1px solid rgba(160,120,30,0.3); border-radius: 0; margin-bottom: 0; }
+  .mini-grid .faq-q { padding: 16px 4px; font-size: 14px; font-weight: 500; color: #3d2b1f; }
+  .mini-grid .faq-q:hover { color: var(--gold-dark); }
+  .mini-grid .faq-q i { color: var(--gold-dark); font-size: 11px; }
+  .mini-grid .faq-a { padding: 0 4px; color: #7a6552; font-size: 13px; font-weight: 300; }
+  .mini-grid .faq-item.open .faq-a { padding-bottom: 16px; }
+
+  .mini-grid .resena { background: rgba(255,255,255,0.6); border: none; border-left: 2px solid var(--gold-dark); border-radius: 0 12px 12px 0; padding: 16px 20px 14px 22px; margin-bottom: 14px; position: relative; }
+  .mini-grid .resena::before { content: "“"; position: absolute; top: -6px; left: 8px; font-family: 'Playfair Display', serif; font-size: 48px; color: rgba(212,175,55,0.35); line-height: 1; }
+  .mini-grid .resena p { font-family: 'Playfair Display', serif; font-style: italic; font-size: 14px; color: #4a3426; line-height: 1.7; margin-top: 6px; }
+  .mini-grid .resena-head strong { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #7a6552; font-weight: 500; }
+  .mini-grid .estrellas { font-size: 13px; }
+  .mini-grid .resumen-estrellas .num { color: var(--gold-dark); }
+  .mini-grid #res-total { color: #7a6552; }
+  .mini-grid .input-group label, .mini-grid .lbl { color: #7a6552; }
+  .mini-grid .input-group input, .mini-grid .input-group textarea { background: rgba(255,255,255,0.75); border: 1px solid rgba(160,120,30,0.35); color: #3d2b1f; }
+  .mini-grid .input-group input::placeholder, .mini-grid .input-group textarea::placeholder { color: #8d7f72; }
+  .mini-grid .star-input span { color: rgba(74,52,38,0.2); }
+  .mini-grid .star-input span.on { color: var(--gold-dark); }
+  .mini-grid .btn-main { background: transparent; color: var(--gold-dark); border: 1px solid var(--gold-dark); border-radius: 30px; padding: 10px 26px; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; display: block; margin: 20px auto 0; }
+  .mini-grid .btn-main:hover { background: var(--gold-dark); color: #fffaf0; }
+  @media (max-width: 900px) { .mini-grid { grid-template-columns: 1fr; } }
+  .app-badge {
+    background: rgba(74,52,38,0.08); border: 1px solid rgba(74,52,38,0.18);
+    padding: 4px 10px; border-radius: 20px; font-size: 11px; color: #5a4130;
+  }
+
+  .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(200px); background: var(--sidebar); color: var(--gold); padding: 14px 24px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); z-index: 999; transition: 0.4s; font-weight: 600; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.error { color: #ff8a80; }
+
+  @media (max-width: 900px) {
+    .menu-layout, .resenas-layout { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <h1>☕ Cafetería Reynosa <span>Boutique</span></h1>
+    <button class="nav-btn active" onclick="nav('resumen', this, 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=2071&auto=format&fit=crop')">🏠 Inicio</button>
+    <button class="nav-btn" onclick="nav('menu', this, 'https://images.unsplash.com/photo-1442512595331-e89e73853f31?q=80&w=2070&auto=format&fit=crop')">📋 Menú y Caja</button>
+    <button class="nav-btn" onclick="nav('pedidos', this, 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=2070&auto=format&fit=crop')">🛵 Mis Pedidos</button>
+    <button class="nav-btn" onclick="nav('opiniones', this, 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?q=80&w=2070&auto=format&fit=crop')">💬 Preguntas y Reseñas</button>
+
+    <!-- SELLO DE LA APP -->
+    <div class="sello-app" title="Sello oficial de la app">
+      <div class="s-icon">☕</div>
+      <div class="s-nombre">Cafetería<br>Reynosa</div>
+      <div class="s-linea">App Oficial</div>
+      <div class="s-check">✔ Calidad Garantizada</div>
+    </div>
+
+    <div class="social-links">
+      <a href="https://wa.me/5218991234567" target="_blank" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+      <a href="https://facebook.com/cafeteriareynosa" target="_blank" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+    </div>
+
+    <a href="#" class="btn-logout" onclick="cerrarSesion(event)">Cerrar Sesión</a>
+  </div>
+
+  <div class="main" id="main-bg" style="background-image: url('https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=2071&auto=format&fit=crop');">
+    <div class="content-wrapper">
+      <div class="page-title" id="page-title">Inicio</div>
+
+      <!-- 1. INICIO -->
+      <div id="resumen" class="section active">
+        <div class="glass-card" style="background: rgba(250,243,230,0.9); color: #4a3426; border: 1px solid rgba(160,120,30,0.4); padding: 60px 40px; text-align: center; margin-top: 50px;">
+          <h2 style="font-family: 'Playfair Display', serif; font-size: 38px; font-style: italic; color: var(--gold-dark); line-height: 1.5;">
+            "El café es el abrazo que te da la mañana. En Reynosa, cada taza está hecha con pasión para inspirar tus mejores ideas."
+          </h2>
+          <p style="margin-top: 30px; font-size: 18px; color: #6d5a50;" id="saludo-usuario">Bienvenido.</p>
+        </div>
+      </div>
+
+      <!-- 2. MENÚ Y CAJA -->
+      <div id="menu" class="section">
+        <div class="menu-layout">
+          <div>
+            <input type="text" id="buscador" class="metodo-pago" style="background: rgba(255,255,255,0.9); border: none; padding: 15px; margin-bottom: 20px; font-size: 15px;" placeholder="🔍 Buscar en todo el menú..." onkeyup="buscarGlobal()">
+            <div class="cat-tabs" id="cat-tabs">
+              <button class="cat-tab active" onclick="cambiarCategoria('Todos', this)">Todos</button>
+              <button class="cat-tab" onclick="cambiarCategoria('Café', this)">Cafés</button>
+              <button class="cat-tab" onclick="cambiarCategoria('Té', this)">Tés</button>
+              <button class="cat-tab" onclick="cambiarCategoria('Fríos', this)">Bebidas Frías</button>
+              <button class="cat-tab" onclick="cambiarCategoria('Panadería', this)">Panadería</button>
+              <button class="cat-tab" onclick="cambiarCategoria('Comida', this)">Comida</button>
+            </div>
+            <div class="grid-prod" id="lista-menu"></div>
+          </div>
+
+          <div class="carrito-panel">
+            <h3 style="font-family: 'Playfair Display'; font-size: 22px; margin-bottom: 15px; border-bottom: 2px solid rgba(0,0,0,0.1); padding-bottom: 10px;">Ticket de Venta</h3>
+            <div id="carrito-items"><p style="font-size:14px; color:#888;">El carrito está vacío.</p></div>
+
+            <label class="lbl">Tipo de entrega</label>
+            <select id="entrega" class="metodo-pago" onchange="cambiarEntrega()">
+              <option value="recoger">🏪 Recoger en sucursal (10–15 min)</option>
+              <option value="express">🛵 Domicilio Express (20–30 min)</option>
+              <option value="programado">📅 Domicilio Programado</option>
+            </select>
+
+            <div id="campos-domicilio" style="display:none;">
+              <input type="text" id="dom-nombre" class="metodo-pago" placeholder="Tu nombre completo">
+              <input type="tel" id="dom-tel" class="metodo-pago" placeholder="Teléfono (10 dígitos)" maxlength="10">
+              <input type="text" id="dom-dir" class="metodo-pago" placeholder="Calle, número y colonia">
+              <input type="text" id="dom-ref" class="metodo-pago" placeholder="Referencias (color de casa, entre calles)">
+              <div id="campo-programado" style="display:none;">
+                <label class="lbl">Fecha y hora de entrega</label>
+                <input type="datetime-local" id="dom-fecha" class="metodo-pago" onchange="renderCarrito()">
+              </div>
+              <div class="free-box">📍 Entregamos en un radio de 5 km. Envío $30.00, ¡gratis en compras mayores a $200!</div>
+            </div>
+
+            <div class="eta-box" id="eta-box"></div>
+
+            <div class="cart-line"><span>Subtotal</span><span id="subtotal">$0.00</span></div>
+            <div class="cart-line"><span>Envío</span><span id="envio">$0.00</span></div>
+            <div class="cart-total"><span>Total:</span><span id="total">$0.00</span></div>
+
+            <label class="lbl">Método de Pago</label>
+            <select id="metodo" class="metodo-pago" onchange="mostrarCamposPago()">
+              <option value="Efectivo">💵 Efectivo</option>
+              <option value="Tarjeta">💳 Tarjeta</option>
+              <option value="Transferencia">📱 Transferencia</option>
+            </select>
+            <div id="campo-tarjeta" style="display:none;"><input type="text" id="detalle-pago" class="metodo-pago" placeholder="Últimos 4 dígitos" maxlength="4"></div>
+            <div id="campo-transf" style="display:none;"><input type="text" id="detalle-pago-transf" class="metodo-pago" placeholder="Folio de transferencia"></div>
+            <button class="btn-cobrar" onclick="cobrar()">Registrar Pago</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. MIS PEDIDOS -->
+      <div id="pedidos" class="section">
+        <div id="lista-pedidos"></div>
+      </div>
+
+      <!-- 4. PREGUNTAS Y RESEÑAS -->
+      <div id="opiniones" class="section">
+        <div class="mini-grid" style="margin-top:0;">
+          <div class="glass-card" style="margin-bottom:0;">
+            <h3 class="mini-titulo">❓ Preguntas frecuentes</h3>
+            <div id="faq-lista"></div>
+          </div>
+
+          <div class="glass-card" style="margin-bottom:0;">
+            <h3 class="mini-titulo">⭐ Reseñas de clientes</h3>
+            <div class="resumen-estrellas" style="justify-content:center;">
+              <div class="num" id="res-promedio">0.0</div>
+              <div>
+                <div class="estrellas" id="res-estrellas" style="font-size:22px;">☆☆☆☆☆</div>
+                <div style="font-size:13px;" id="res-total">Sin reseñas todavía</div>
+              </div>
+            </div>
+            <div id="lista-resenas" style="max-height: 380px; overflow-y: auto; padding-right: 6px;"></div>
+          </div>
+
+          <div class="glass-card" style="margin-bottom:0; grid-column: 1 / -1;">
+            <h3 class="mini-titulo">✍️ Deja tu reseña</h3>
+            <div style="max-width: 560px; margin: 0 auto;">
+              <div class="input-group"><label>Tu nombre</label><input type="text" id="res-nombre" placeholder="Ej. Juan"></div>
+              <label class="lbl" style="margin-top:0;">Calificación</label>
+              <div class="star-input" id="star-input"></div>
+              <div class="input-group"><label>Tu comentario</label><textarea id="res-texto" rows="4" placeholder="Cuéntanos tu experiencia..."></textarea></div>
+              <button class="btn-main" onclick="guardarResena()">Publicar reseña</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <footer class="footer-pro">
+      <div class="footer-grid">
+        <div>
+          <div class="f-marca">☕ Cafetería Reynosa</div>
+          <p>Café de calidad y buen ambiente para inspirar tus mejores ideas, en el corazón de Reynosa.</p>
+          <div class="f-badges">
+            <span class="app-badge">🛡️ Pago Seguro</span>
+            <span class="app-badge">✅ Calidad Garantizada</span>
+            <span class="app-badge">📱 App Móvil</span>
+          </div>
+        </div>
+        <div>
+          <div class="f-titulo">Síguenos y Contáctanos</div>
+          <div class="f-redes">
+            <a href="https://facebook.com/cafeteriareynosa" target="_blank" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="https://wa.me/5218991234567" target="_blank" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+          </div>
+          <p style="margin-top:10px;">📍 Reynosa, Tamaulipas<br>🕗 Atención todos los días</p>
+        </div>
+        <div>
+          <div class="f-titulo">Información</div>
+          <a href="#" class="f-link" onclick="abrirLegal('terminos', event)">Términos y Condiciones</a>
+          <a href="#" class="f-link" onclick="abrirLegal('privacidad', event)">Aviso de Privacidad</a>
+          <a href="#" class="f-link" onclick="abrirLegal('envios', event)">Política de Envíos y Devoluciones</a>
+          <a href="#" class="f-link" onclick="nav('opiniones', document.querySelectorAll('.nav-btn')[3]); return false;">Preguntas Frecuentes</a>
+        </div>
+      </div>
+      <div class="f-copy">&copy; <span id="anio-actual">2024</span> Cafetería Reynosa. Todos los derechos reservados.</div>
+    </footer>
+
+    <!-- MODAL LEGAL -->
+    <div class="modal-bg" id="modal-legal">
+      <div class="modal-box" style="width: 650px;">
+        <h3 id="legal-titulo"></h3>
+        <div id="legal-contenido" class="help-content active" style="display:block;"></div>
+        <button class="btn-main" style="width:100%; margin-top:20px;" onclick="cerrarLegal()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <button class="help-btn" onclick="abrirAyuda()">❓</button>
+
+  <!-- MODAL DE AYUDA -->
+  <div class="modal-bg" id="modal-ayuda">
+    <div class="modal-box">
+      <h3>💡 Centro de Ayuda</h3>
+      <div class="help-tabs">
+        <button class="help-tab active" onclick="cambiarTabAyuda('clientes', this)">Cómo ordenar</button>
+        <button class="help-tab" onclick="cambiarTabAyuda('terminos', this)">Términos y Envíos</button>
+      </div>
+
+      <div id="tab-ayuda-clientes" class="help-content active">
+        <h4>👤 Bienvenido a Cafetería Reynosa</h4>
+        <p>Para ordenar, entra a <strong>Menú y Caja</strong>, elige tus productos con "Agregar", escoge si es para recoger o a domicilio, elige tu método de pago y presiona "Registrar Pago".</p>
+        <p>Si pides a domicilio, llena tus datos y verás el <strong>tiempo estimado de llegada</strong>. Después puedes seguir tu pedido en <strong>Mis Pedidos</strong>.</p>
+      </div>
+
+      <div id="tab-ayuda-terminos" class="help-content">
+        <h4>📄 Términos y Condiciones</h4>
+        <p>Al realizar un pedido, aceptas nuestros términos. Los precios están sujetos a cambio sin previo aviso. Los productos perecederos no tienen cambio ni devolución una vez entregados. Si tu pedido llega en mal estado, contáctanos en los primeros 15 minutos.</p>
+        <h4>🛵 Métodos y Tiempos de Envío</h4>
+        <ul>
+          <li><strong>Express (Domicilio):</strong> 20 a 30 min.</li>
+          <li><strong>Recoger en sucursal:</strong> 10 a 15 min.</li>
+          <li><strong>Programado:</strong> Elige fecha y hora al pagar.</li>
+        </ul>
+        <p style="font-size: 12px; font-style: italic; color: #888;">* Los tiempos pueden variar por clima o alta demanda.</p>
+      </div>
+
+      <div style="text-align: center; margin-top: 25px;">
+        <button class="btn-main" style="width: 100%;" onclick="cerrarAyuda()">Entendido, cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL TICKET -->
+  <div class="modal-bg" id="modal-ticket">
+    <div class="modal-box" style="width: 400px;">
+      <h3>🧾 Ticket de Venta</h3>
+      <div id="ticket-contenido" style="font-size: 13px; line-height: 1.7;"></div>
+      <button class="btn-main" style="width: 100%; margin-top: 20px;" onclick="cerrarTicket()">Cerrar</button>
+      <button class="btn-main" style="width: 100%; margin-top: 10px; background:#e3f2fd; color:var(--info);" onclick="verMisPedidos()">Ver seguimiento de mi pedido</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">✔ Acción realizada</div>
+
+<script>
+/* ============================================================
+   ESTADO GLOBAL
+============================================================ */
+let menuGlobal = [];
+let carrito = [];
+let categoriaActual = 'Todos';
+let estrellasSel = 0;
+
+/* ============================================================
+   UTILIDADES
+============================================================ */
+function getData(key, fallback) {
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+  catch (e) { return fallback; }
+}
+function setData(key, value) {
+  try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+}
+function mostrarToast(msg, tipo) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + (tipo || '');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.className = 'toast ' + (tipo || ''), 2500);
+}
+function dinero(n) { return '$' + Number(n).toFixed(2); }
+function ahora() { return new Date().toLocaleString('es-MX'); }
+function hora(ms) { return new Date(ms).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }); }
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ============================================================
+   DATOS
+============================================================ */
+const MENU_SEED = [
+  { id: 1, nombre: "Espresso", precio: 35, categoria: "Café", img: "https://images.unsplash.com/photo-1510707577719-ae7c14805e3a?w=400" },
+  { id: 2, nombre: "Americano", precio: 40, categoria: "Café", img: "https://images.unsplash.com/photo-1551030173-122aabc4489c?w=400" },
+  { id: 3, nombre: "Capuchino", precio: 55, categoria: "Café", img: "https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=400" },
+  { id: 4, nombre: "Latte Vainilla", precio: 60, categoria: "Café", img: "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400" },
+  { id: 5, nombre: "Té Verde", precio: 35, categoria: "Té", img: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=400" },
+  { id: 6, nombre: "Té Chai", precio: 45, categoria: "Té", img: "https://images.unsplash.com/photo-1597481499750-3e6b22637e12?w=400" },
+  { id: 7, nombre: "Frappé Moka", precio: 70, categoria: "Fríos", img: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=400" },
+  { id: 8, nombre: "Cold Brew", precio: 55, categoria: "Fríos", img: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=400" },
+  { id: 9, nombre: "Croissant", precio: 40, categoria: "Panadería", img: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=400" },
+  { id: 10, nombre: "Concha", precio: 25, categoria: "Panadería", img: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400" },
+  { id: 11, nombre: "Sandwich Club", precio: 85, categoria: "Comida", img: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=400" },
+  { id: 12, nombre: "Bagel con Queso", precio: 60, categoria: "Comida", img: "https://images.unsplash.com/photo-1585445490387-f47934b73b54?w=400" }
+];
+
+const FAQ = [
+  { q: "¿Hacen envíos a domicilio?", a: "Sí, entregamos en un radio de 5 km alrededor de la cafetería." },
+  { q: "¿Cuánto cuesta el envío?", a: "El costo es de $30.00 MXN. ¡Gratis en compras mayores a $200!" },
+  { q: "¿Cuánto tarda mi pedido?", a: "Domicilio Express: 20 a 30 minutos. Recoger en sucursal: 10 a 15 minutos. También puedes programar tu pedido para otra fecha y hora." },
+  { q: "¿Puedo pagar con tarjeta al recibir?", a: "Sí, contamos con terminal para tarjetas de débito y crédito. También aceptamos efectivo y transferencia." },
+  { q: "¿Cómo sigo mi pedido?", a: "Entra a la sección Mis Pedidos. Ahí verás en qué paso va tu pedido y la hora estimada de llegada." },
+  { q: "¿Qué hago si mi pedido llega en mal estado?", a: "Contáctanos por WhatsApp en los primeros 15 minutos después de la entrega y lo resolvemos." },
+  { q: "¿Puedo cancelar o cambiar mi pedido?", a: "Puedes cancelar antes de que pase a preparación. Escríbenos de inmediato por WhatsApp." }
+];
+
+/* ============================================================
+   INICIO
+============================================================ */
+function inicializar() {
+  menuGlobal = MENU_SEED;
+  let usuario = getData('cr_usuario', null);
+  if (!usuario) {
+    usuario = (prompt('¿Cómo te llamas?') || '').trim() || 'invitado';
+    setData('cr_usuario', usuario);
+  }
+  document.getElementById('saludo-usuario').textContent = 'Bienvenido, ' + usuario + '. ¡Que tengas un excelente día!';
+
+  renderMenu();
+  renderCarrito();
+  renderFAQ();
+  renderEstrellasInput();
+  renderResenas();
+  renderPedidos();
+  setInterval(renderPedidos, 20000);
+}
+
+/* ============================================================
+   NAVEGACIÓN
+============================================================ */
+const TITULOS = { resumen: 'Inicio', menu: 'Menú y Caja', pedidos: 'Mis Pedidos', opiniones: 'Preguntas y Reseñas' };
+
+function nav(id, btn, bg) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.getElementById('page-title').textContent = TITULOS[id] || '';
+  if (bg) document.getElementById('main-bg').style.backgroundImage = "url('" + bg + "')";
+  if (id === 'pedidos') renderPedidos();
+}
+
+function cerrarSesion(e) {
+  e.preventDefault();
+  if (confirm('¿Seguro que deseas cerrar sesión?')) {
+    localStorage.removeItem('cr_usuario');
+    carrito = [];
+    location.reload();
+  }
+}
+
+/* ============================================================
+   MENÚ Y CAJA
+============================================================ */
+/* Imagen de respaldo (se ve aunque no haya internet) */
+const EMOJIS = { 1: '☕', 2: '☕', 3: '☕', 4: '🥛', 5: '🍵', 6: '🫖', 7: '🥤', 8: '🧊', 9: '🥐', 10: '🍞', 11: '🥪', 12: '🥯' };
+const COLORES = { 'Café': ['#6f4e37', '#c49a6c'], 'Té': ['#2e7d32', '#a5d6a7'], 'Fríos': ['#1565c0', '#90caf9'], 'Panadería': ['#e08e45', '#ffd8a8'], 'Comida': ['#8d3b2e', '#f4a261'] };
+function imagenRespaldo(id) {
+  const p = MENU_SEED.find(x => x.id === id);
+  const c = COLORES[p.categoria] || ['#6f4e37', '#c49a6c'];
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="240" viewBox="0 0 400 240">' +
+    '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' + c[0] + '"/><stop offset="1" stop-color="' + c[1] + '"/></linearGradient></defs>' +
+    '<rect width="400" height="240" fill="url(#g)"/>' +
+    '<text x="200" y="145" font-size="100" text-anchor="middle">' + (EMOJIS[id] || '☕') + '</text></svg>';
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+
+function renderMenu() {
+  const q = document.getElementById('buscador').value.trim().toLowerCase();
+  const lista = menuGlobal.filter(p => {
+    const okCat = categoriaActual === 'Todos' || p.categoria === categoriaActual;
+    const okTxt = !q || p.nombre.toLowerCase().includes(q);
+    return okCat && okTxt;
+  });
+  const cont = document.getElementById('lista-menu');
+  if (!lista.length) { cont.innerHTML = '<p style="color:white;">No se encontraron productos.</p>'; return; }
+  cont.innerHTML = lista.map(p => `
+    <div class="prod-card">
+      <img src="${p.img}" alt="${esc(p.nombre)}" loading="lazy" onerror="this.onerror=null; this.src=imagenRespaldo(${p.id});">
+      <h4>${esc(p.nombre)}</h4>
+      <p>${dinero(p.precio)}</p>
+      <button class="btn-add" onclick="agregarAlCarrito(${p.id})">Agregar</button>
+    </div>`).join('');
+}
+
+function cambiarCategoria(cat, btn) {
+  categoriaActual = cat;
+  document.querySelectorAll('#cat-tabs .cat-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderMenu();
+}
+
+function buscarGlobal() {
+  const q = document.getElementById('buscador').value.trim();
+  if (q) {
+    categoriaActual = 'Todos';
+    document.querySelectorAll('#cat-tabs .cat-tab').forEach((b, i) => b.classList.toggle('active', i === 0));
+  }
+  renderMenu();
+}
+
+function agregarAlCarrito(id) {
+  const prod = menuGlobal.find(p => p.id === id);
+  if (!prod) return;
+  const item = carrito.find(i => i.id === id);
+  if (item) item.cant++; else carrito.push({ id: prod.id, nombre: prod.nombre, precio: prod.precio, cant: 1 });
+  renderCarrito();
+}
+
+function cambiarCantidad(id, delta) {
+  const item = carrito.find(i => i.id === id);
+  if (!item) return;
+  item.cant += delta;
+  if (item.cant <= 0) carrito = carrito.filter(i => i.id !== id);
+  renderCarrito();
+}
+
+function subtotalCarrito() { return carrito.reduce((s, i) => s + i.precio * i.cant, 0); }
+function esDomicilio() { return document.getElementById('entrega').value !== 'recoger'; }
+function costoEnvio() {
+  if (!esDomicilio() || !carrito.length) return 0;
+  return subtotalCarrito() > 200 ? 0 : 30;
+}
+
+function cambiarEntrega() {
+  const e = document.getElementById('entrega').value;
+  document.getElementById('campos-domicilio').style.display = e === 'recoger' ? 'none' : 'block';
+  document.getElementById('campo-programado').style.display = e === 'programado' ? 'block' : 'none';
+  renderCarrito();
+}
+
+/* Calcula la ventana de llegada estimada */
+function calcularEta() {
+  const e = document.getElementById('entrega').value;
+  const ahoraMs = Date.now();
+  if (e === 'recoger') return { min: ahoraMs + 10 * 60000, max: ahoraMs + 15 * 60000, texto: '🏪 Tu pedido estará listo para recoger entre las <strong>' };
+  if (e === 'express') return { min: ahoraMs + 20 * 60000, max: ahoraMs + 30 * 60000, texto: '🛵 Tu pedido llegará entre las <strong>' };
+  const f = document.getElementById('dom-fecha').value;
+  if (!f) return null;
+  const ms = new Date(f).getTime();
+  return { min: ms, max: ms + 10 * 60000, programado: true };
+}
+
+function renderCarrito() {
+  const cont = document.getElementById('carrito-items');
+  if (!carrito.length) {
+    cont.innerHTML = '<p style="font-size:14px; color:#888;">El carrito está vacío.</p>';
+  } else {
+    cont.innerHTML = carrito.map(i => `
+      <div class="cart-item">
+        <span style="flex:1;">${esc(i.nombre)}</span>
+        <span class="qty">
+          <button onclick="cambiarCantidad(${i.id}, -1)">−</button>
+          <strong style="margin:0 6px;">${i.cant}</strong>
+          <button onclick="cambiarCantidad(${i.id}, 1)">+</button>
+        </span>
+        <span style="min-width:70px; text-align:right;">${dinero(i.precio * i.cant)}</span>
+      </div>`).join('');
+  }
+  const sub = subtotalCarrito();
+  const env = costoEnvio();
+  document.getElementById('subtotal').textContent = dinero(sub);
+  document.getElementById('envio').textContent = esDomicilio() ? (env === 0 && carrito.length ? 'GRATIS' : dinero(env)) : '—';
+  document.getElementById('total').textContent = dinero(sub + env);
+
+  const eta = calcularEta();
+  const box = document.getElementById('eta-box');
+  if (!eta) {
+    box.innerHTML = '📅 Elige la fecha y hora para tu entrega programada.';
+  } else if (eta.programado) {
+    box.innerHTML = '📅 Entrega programada: <strong>' + new Date(eta.min).toLocaleString('es-MX') + '</strong>';
+  } else {
+    box.innerHTML = eta.texto + hora(eta.min) + '</strong> y las <strong>' + hora(eta.max) + '</strong> (si pagas ahora).';
+  }
+}
+
+function mostrarCamposPago() {
+  const m = document.getElementById('metodo').value;
+  document.getElementById('campo-tarjeta').style.display = m === 'Tarjeta' ? 'block' : 'none';
+  document.getElementById('campo-transf').style.display = m === 'Transferencia' ? 'block' : 'none';
+}
+
+function cobrar() {
+  if (!carrito.length) { mostrarToast('⚠ El carrito está vacío', 'error'); return; }
+
+  const tipo = document.getElementById('entrega').value;
+  let domicilio = null;
+  if (tipo !== 'recoger') {
+    const nombre = document.getElementById('dom-nombre').value.trim();
+    const tel = document.getElementById('dom-tel').value.trim();
+    const dir = document.getElementById('dom-dir').value.trim();
+    const ref = document.getElementById('dom-ref').value.trim();
+    if (!nombre) { mostrarToast('⚠ Escribe tu nombre', 'error'); return; }
+    if (!/^\d{10}$/.test(tel)) { mostrarToast('⚠ El teléfono debe tener 10 dígitos', 'error'); return; }
+    if (!dir) { mostrarToast('⚠ Escribe tu dirección', 'error'); return; }
+    if (tipo === 'programado') {
+      const f = document.getElementById('dom-fecha').value;
+      if (!f) { mostrarToast('⚠ Elige fecha y hora de entrega', 'error'); return; }
+      if (new Date(f).getTime() < Date.now() + 30 * 60000) { mostrarToast('⚠ Programa con al menos 30 min de anticipación', 'error'); return; }
+    }
+    domicilio = { nombre: nombre, tel: tel, dir: dir, ref: ref };
+  }
+
+  const metodo = document.getElementById('metodo').value;
+  let detalle = '';
+  if (metodo === 'Tarjeta') {
+    detalle = document.getElementById('detalle-pago').value.trim();
+    if (!/^\d{4}$/.test(detalle)) { mostrarToast('⚠ Escribe los últimos 4 dígitos', 'error'); return; }
+  } else if (metodo === 'Transferencia') {
+    detalle = document.getElementById('detalle-pago-transf').value.trim();
+    if (!detalle) { mostrarToast('⚠ Escribe el folio de transferencia', 'error'); return; }
+  }
+
+  const eta = calcularEta();
+  const pedidos = getData('cr_pedidos', []);
+  const sub = subtotalCarrito();
+  const env = costoEnvio();
+  const pedido = {
+    folio: 'T-' + String(pedidos.length + 1).padStart(4, '0'),
+    creado: Date.now(),
+    fecha: ahora(),
+    items: carrito.map(i => ({ nombre: i.nombre, cant: i.cant, precio: i.precio })),
+    subtotal: sub,
+    envio: env,
+    total: sub + env,
+    metodo: metodo,
+    detalle: detalle,
+    tipo: tipo,
+    domicilio: domicilio,
+    etaMin: eta.min,
+    etaMax: eta.max,
+    cliente: getData('cr_usuario', 'invitado')
+  };
+  pedidos.push(pedido);
+  setData('cr_pedidos', pedidos);
+
+  mostrarTicket(pedido);
+  carrito = [];
+  ['detalle-pago', 'detalle-pago-transf', 'dom-nombre', 'dom-tel', 'dom-dir', 'dom-ref', 'dom-fecha'].forEach(id => document.getElementById(id).value = '');
+  renderCarrito();
+  renderPedidos();
+  mostrarToast('✔ Pedido registrado');
+}
+
+function nombreEntrega(t) {
+  return t === 'recoger' ? 'Recoger en sucursal' : t === 'express' ? 'Domicilio Express' : 'Domicilio Programado';
+}
+
+function mostrarTicket(p) {
+  let html = `<p><strong>Cafetería Reynosa</strong><br>Folio: ${p.folio}<br>Fecha: ${p.fecha}<br>Cliente: ${esc(p.cliente)}</p><hr style="margin:10px 0;">`;
+  html += p.items.map(i => `<div style="display:flex; justify-content:space-between;"><span>${i.cant} × ${esc(i.nombre)}</span><span>${dinero(i.cant * i.precio)}</span></div>`).join('');
+  html += `<hr style="margin:10px 0;">
+    <div style="display:flex; justify-content:space-between;"><span>Subtotal</span><span>${dinero(p.subtotal)}</span></div>
+    <div style="display:flex; justify-content:space-between;"><span>Envío</span><span>${p.tipo === 'recoger' ? '—' : (p.envio === 0 ? 'GRATIS' : dinero(p.envio))}</span></div>
+    <div style="display:flex; justify-content:space-between; font-weight:700; font-size:16px;"><span>TOTAL</span><span>${dinero(p.total)}</span></div>`;
+  html += `<p style="margin-top:10px;">Pago: ${p.metodo}${p.detalle ? ' (' + esc(p.detalle) + ')' : ''}</p>`;
+  html += `<p>Entrega: ${nombreEntrega(p.tipo)}</p>`;
+  if (p.domicilio) {
+    html += `<p>📍 ${esc(p.domicilio.dir)}${p.domicilio.ref ? ' (' + esc(p.domicilio.ref) + ')' : ''}<br>👤 ${esc(p.domicilio.nombre)} · 📞 ${esc(p.domicilio.tel)}</p>`;
+  }
+  if (p.tipo === 'programado') {
+    html += `<p style="background:#e3f2fd; padding:10px; border-radius:8px;">📅 Entrega programada: <strong>${new Date(p.etaMin).toLocaleString('es-MX')}</strong></p>`;
+  } else {
+    html += `<p style="background:#e3f2fd; padding:10px; border-radius:8px;">⏱ ${p.tipo === 'recoger' ? 'Listo para recoger' : 'Llegada estimada'}: <strong>${hora(p.etaMin)} – ${hora(p.etaMax)}</strong></p>`;
+  }
+  html += `<p style="text-align:center; margin-top:10px;">¡Gracias por tu visita! ☕</p>`;
+  document.getElementById('ticket-contenido').innerHTML = html;
+  document.getElementById('modal-ticket').style.display = 'flex';
+}
+function cerrarTicket() { document.getElementById('modal-ticket').style.display = 'none'; }
+function verMisPedidos() {
+  cerrarTicket();
+  nav('pedidos', document.querySelectorAll('.nav-btn')[2], 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=2070&auto=format&fit=crop');
+}
+
+/* ============================================================
+   MIS PEDIDOS (SEGUIMIENTO)
+============================================================ */
+function estadoPedido(p) {
+  const ahoraMs = Date.now();
+  const min = (ahoraMs - p.creado) / 60000;
+  if (p.tipo === 'recoger') {
+    const pasos = ['Recibido', 'Preparando', 'Listo para recoger'];
+    let idx = min < 2 ? 0 : (ahoraMs < p.etaMin ? 1 : 2);
+    return { pasos: pasos, idx: idx, fin: idx === 2 };
+  }
+  const pasos = ['Recibido', 'Preparando', 'En camino', 'Entregado'];
+  if (p.tipo === 'programado') {
+    const inicio = p.etaMin - 30 * 60000;
+    let idx = ahoraMs < inicio ? 0 : (ahoraMs < p.etaMin - 15 * 60000 ? 1 : (ahoraMs < p.etaMin ? 2 : 3));
+    return { pasos: pasos, idx: idx, fin: idx === 3 };
+  }
+  let idx = min < 2 ? 0 : (min < 10 ? 1 : (ahoraMs < p.etaMax ? 2 : 3));
+  return { pasos: pasos, idx: idx, fin: idx === 3 };
+}
+
+function renderPedidos() {
+  const cont = document.getElementById('lista-pedidos');
+  const pedidos = getData('cr_pedidos', []).slice().reverse();
+  if (!pedidos.length) {
+    cont.innerHTML = '<div class="glass-card" style="text-align:center;">Aún no tienes pedidos. Ve a <strong>Menú y Caja</strong> para hacer el primero ☕</div>';
+    return;
+  }
+  cont.innerHTML = pedidos.map(p => {
+    const est = estadoPedido(p);
+    const pasosHtml = est.pasos.map((n, i) => {
+      const cls = i < est.idx || (est.fin && i === est.idx) ? 'hecho' : (i === est.idx ? 'actual' : '');
+      return `<div class="paso ${cls}"><div class="dot">${cls === 'hecho' ? '✔' : i + 1}</div>${n}</div>`;
+    }).join('');
+    const etaTxt = p.tipo === 'programado'
+      ? '📅 Programado: ' + new Date(p.etaMin).toLocaleString('es-MX')
+      : '⏱ ' + (p.tipo === 'recoger' ? 'Listo' : 'Llegada') + ' estimada: ' + hora(p.etaMin) + ' – ' + hora(p.etaMax);
+    const dom = p.domicilio ? `<p style="font-size:13px; color:var(--text-light); margin-top:6px;">📍 ${esc(p.domicilio.dir)} · 👤 ${esc(p.domicilio.nombre)} · 📞 ${esc(p.domicilio.tel)}</p>` : '';
+    return `<div class="pedido-card">
+      <div class="pedido-head">
+        <strong>Pedido ${p.folio}</strong>
+        <span class="badge ${est.fin ? 'ok' : ''}">${est.fin ? '✔ ' : '⏳ '}${est.pasos[est.idx]}</span>
+      </div>
+      <div style="font-size:13px; color:var(--text-light);">${nombreEntrega(p.tipo)} · ${p.fecha} · Total ${dinero(p.total)}</div>
+      <div style="font-size:14px; margin-top:6px;">${p.items.map(i => i.cant + '× ' + esc(i.nombre)).join(', ')}</div>
+      ${dom}
+      <div class="pasos">${pasosHtml}</div>
+      <div class="eta-box" style="margin:0;">${etaTxt}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ============================================================
+   PREGUNTAS FRECUENTES
+============================================================ */
+function renderFAQ() {
+  document.getElementById('faq-lista').innerHTML = FAQ.map((f, i) => `
+    <div class="faq-item" id="faq-${i}">
+      <button class="faq-q" onclick="toggleFAQ(${i})"><span>${esc(f.q)}</span><i class="fa-solid fa-chevron-down"></i></button>
+      <div class="faq-a">${esc(f.a)}</div>
+    </div>`).join('');
+}
+function toggleFAQ(i) { document.getElementById('faq-' + i).classList.toggle('open'); }
+
+
+/* ============================================================
+   RESEÑAS
+============================================================ */
+function renderEstrellasInput() {
+  const cont = document.getElementById('star-input');
+  cont.innerHTML = [1, 2, 3, 4, 5].map(n => `<span class="${n <= estrellasSel ? 'on' : ''}" onclick="elegirEstrellas(${n})">★</span>`).join('');
+}
+function elegirEstrellas(n) { estrellasSel = n; renderEstrellasInput(); }
+
+function estrellasTxt(n) { return '★'.repeat(n) + '☆'.repeat(5 - n); }
+
+function guardarResena() {
+  const nombre = document.getElementById('res-nombre').value.trim();
+  const texto = document.getElementById('res-texto').value.trim();
+  if (!nombre) { mostrarToast('⚠ Escribe tu nombre', 'error'); return; }
+  if (!estrellasSel) { mostrarToast('⚠ Elige una calificación', 'error'); return; }
+  if (texto.length < 5) { mostrarToast('⚠ Escribe un comentario', 'error'); return; }
+  const lista = getData('cr_resenas', []);
+  lista.push({ nombre: nombre, estrellas: estrellasSel, texto: texto, fecha: new Date().toLocaleDateString('es-MX') });
+  setData('cr_resenas', lista);
+  document.getElementById('res-nombre').value = '';
+  document.getElementById('res-texto').value = '';
+  estrellasSel = 0;
+  renderEstrellasInput();
+  renderResenas();
+  mostrarToast('✔ ¡Gracias por tu reseña!');
+}
+
+function renderResenas() {
+  const lista = getData('cr_resenas', []);
+  const cont = document.getElementById('lista-resenas');
+  if (!lista.length) {
+    cont.innerHTML = '<p style="font-family:\'Playfair Display\',serif; font-style:italic; font-size:15px; color:#7a6552; text-align:center; padding:25px 10px;">Todavía no hay reseñas.<br>Sé la primera persona en compartir tu experiencia ☕</p>';
+    document.getElementById('res-promedio').textContent = '0.0';
+    document.getElementById('res-estrellas').textContent = estrellasTxt(0);
+    document.getElementById('res-total').textContent = 'Sin reseñas todavía';
+    return;
+  }
+  const prom = lista.reduce((s, r) => s + r.estrellas, 0) / lista.length;
+  document.getElementById('res-promedio').textContent = prom.toFixed(1);
+  document.getElementById('res-estrellas').textContent = estrellasTxt(Math.round(prom));
+  document.getElementById('res-total').textContent = lista.length + (lista.length === 1 ? ' reseña' : ' reseñas');
+  cont.innerHTML = lista.slice().reverse().map(r => `
+    <div class="resena">
+      <div class="resena-head"><strong>${esc(r.nombre)}</strong><span class="estrellas">${estrellasTxt(r.estrellas)}</span></div>
+      <p>${esc(r.texto)}</p>
+      <small>${r.fecha}</small>
+    </div>`).join('');
+}
+
+/* ============================================================
+   AYUDA
+============================================================ */
+function abrirAyuda() { document.getElementById('modal-ayuda').style.display = 'flex'; }
+function cerrarAyuda() { document.getElementById('modal-ayuda').style.display = 'none'; }
+function cambiarTabAyuda(tab, btn) {
+  document.querySelectorAll('.help-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-ayuda-' + tab).classList.add('active');
+  document.querySelectorAll('.help-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+/* ============================================================
+   TÉRMINOS, PRIVACIDAD Y ENVÍOS
+============================================================ */
+const LEGAL = {
+  terminos: {
+    titulo: '📄 Términos y Condiciones',
+    html: `
+      <p><em>Última actualización: ${new Date().toLocaleDateString('es-MX')}</em></p>
+      <h4>1. Aceptación</h4>
+      <p>Al usar esta aplicación y realizar un pedido en Cafetería Reynosa aceptas estos términos y condiciones.</p>
+      <h4>2. Precios y pagos</h4>
+      <p>Los precios están en pesos mexicanos (MXN) y pueden cambiar sin previo aviso. Aceptamos efectivo, tarjeta de débito o crédito y transferencia. En pagos por transferencia debes capturar el folio.</p>
+      <h4>3. Pedidos</h4>
+      <p>Un pedido se considera confirmado cuando se registra el pago y recibes tu ticket con folio. Puedes cancelar antes de que el pedido pase a preparación; después ya no es posible.</p>
+      <h4>4. Productos perecederos</h4>
+      <p>Los alimentos y bebidas no tienen cambio ni devolución una vez entregados. Si tu pedido llega en mal estado o incompleto, contáctanos dentro de los primeros 15 minutos después de la entrega.</p>
+      <h4>5. Tiempos estimados</h4>
+      <p>Los tiempos de entrega son estimados y pueden variar por clima, tráfico o alta demanda.</p>
+      <h4>6. Reseñas</h4>
+      <p>Las reseñas deben ser honestas y respetuosas. Nos reservamos el derecho de retirar comentarios ofensivos.</p>
+      <h4>7. Cambios</h4>
+      <p>Podemos modificar estos términos en cualquier momento. El uso continuo de la aplicación implica que aceptas los cambios.</p>`
+  },
+  privacidad: {
+    titulo: '🔒 Aviso de Privacidad',
+    html: `
+      <h4>Datos que recabamos</h4>
+      <p>Tu nombre, teléfono, dirección de entrega y referencias (solo en pedidos a domicilio), además de tu pedido y método de pago. De las tarjetas solo se guardan los últimos 4 dígitos.</p>
+      <h4>Para qué los usamos</h4>
+      <p>Para preparar y entregar tu pedido, contactarte si hay algún problema y mejorar nuestro servicio.</p>
+      <h4>Con quién los compartimos</h4>
+      <p>No vendemos ni compartimos tus datos con terceros, salvo el personal de reparto que necesita tu dirección para entregarte.</p>
+      <h4>Tus derechos</h4>
+      <p>Puedes pedir acceso, corrección o eliminación de tus datos escribiéndonos por WhatsApp o Facebook.</p>
+      <h4>Almacenamiento</h4>
+      <p>En esta versión de la aplicación los datos se guardan en tu propio navegador (localStorage) y no se envían a ningún servidor.</p>`
+  },
+  envios: {
+    titulo: '🛵 Política de Envíos y Devoluciones',
+    html: `
+      <h4>Cobertura</h4>
+      <p>Entregamos en un radio de 5 km alrededor de la cafetería.</p>
+      <h4>Costo</h4>
+      <p>El envío cuesta $30.00 MXN. Es gratis en compras mayores a $200.</p>
+      <h4>Tiempos</h4>
+      <ul>
+        <li><strong>Express (domicilio):</strong> 20 a 30 min.</li>
+        <li><strong>Recoger en sucursal:</strong> 10 a 15 min.</li>
+        <li><strong>Programado:</strong> eliges fecha y hora (mínimo 30 min de anticipación).</li>
+      </ul>
+      <h4>Al recibir tu pedido</h4>
+      <p>Revisa que esté completo. Si algo falta o llega en mal estado, avísanos en los primeros 15 minutos.</p>
+      <h4>Devoluciones</h4>
+      <p>Por ser productos perecederos no hay devoluciones, pero si hubo un error de nuestra parte lo reponemos o te reembolsamos.</p>`
+  }
+};
+
+function abrirLegal(tipo, e) {
+  if (e) e.preventDefault();
+  document.getElementById('legal-titulo').textContent = LEGAL[tipo].titulo;
+  document.getElementById('legal-contenido').innerHTML = LEGAL[tipo].html;
+  document.getElementById('modal-legal').style.display = 'flex';
+}
+function cerrarLegal() { document.getElementById('modal-legal').style.display = 'none'; }
+
+/* ============================================================
+   ARRANQUE
+============================================================ */
+document.getElementById('anio-actual').textContent = new Date().getFullYear();
+inicializar();
+</script>
+</body>
+</html>
